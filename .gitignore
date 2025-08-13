@@ -1,0 +1,25 @@
+# 虚拟环境目录
+venv/
+
+# IDE 配置目录
+.idea/
+
+# Python 编译缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 环境变量文件
+.env*
+
+# 日志文件
+*.log
+
+# 临时文件、备份文件等
+*.tmp
+*.bak
+
+dist/
+build/
+
+*.sqlite
