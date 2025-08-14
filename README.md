@@ -129,8 +129,7 @@
    ```
 
 
-### 运行服务python app.py服务将启动在 `http://localhost:5000`，首次运行会自动初始化数据库并创建测试数据（2 个测试用户 + 3 个测试帖子）。
-
+### 运行服务python app.py服务将启动在 `http://localhost:5000`
 
 ## 8. 注意事项
 - 开发环境使用 SQLite 数据库，生产环境建议迁移至 MySQL/PostgreSQL
