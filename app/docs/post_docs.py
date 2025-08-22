@@ -71,6 +71,15 @@ class PostDetailDoc(Resource):
     def get(self, post_id):
         """获取帖子详情（含评论列表）"""
         return PostService.get_post_detail(post_id)
+    @jwt_required()
+    def delete(self, post_id):
+        """删除帖子（需登录且为作者）"""
+        current_email = get_jwt_identity()
+        user = UserService.get_user_by_email(current_email)
+        if not user:
+            return {'msg': '用户不存在'}, 404
+        
+        return PostService.delete_post(user.id, post_id)
 
 # 帖子点赞接口
 @post_ns.route('/posts/<int:post_id>/like')

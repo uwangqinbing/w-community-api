@@ -95,6 +95,16 @@
 - 请求头：`Authorization: Bearer <token>`（需登录）
 - 响应：`{likes: 最新点赞数, isLiked: 是否已点赞}`
 
+#### 删除帖子
+- 路径：`DELETE /api/posts/<post_id>`
+- 请求头：`Authorization: Bearer <token>`（需登录且为作者）
+- 响应：`{msg: "帖子删除成功"}`
+
+#### 举报帖子
+- 路径：`POST /api/posts/<post_id>/report`
+- 请求头：`Authorization: Bearer <token>`（需登录）
+- 请求体：`{reason: "举报原因"}`
+- 响应：`{msg: "举报成功", report: {...}}`
 
 ### 评论相关接口
 
@@ -104,6 +114,16 @@
 - 请求体：`{content}`
 - 响应：`{id, author, content, date, ...}`(创建的评论信息)
 
+#### 删除评论
+- 路径：`DELETE /api/posts/<post_id>/comments/<comment_id>`
+- 请求头：`Authorization: Bearer <token>`（需登录且为评论作者）
+- 响应：`{msg: "评论删除成功"}`
+
+#### 举报评论
+- 路径：`POST /api/comments/<comment_id>/report`
+- 请求头：`Authorization: Bearer <token>`（需登录）
+- 请求体：`{reason: "举报原因"}`
+- 响应：`{msg: "举报成功", report: {...}}`
 
 ## 7. 快速开始
 

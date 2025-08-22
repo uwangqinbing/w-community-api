@@ -49,3 +49,15 @@ class CommentDoc(Resource):
         db.session.add(new_comment)
         db.session.commit()
         return new_comment.to_dict()
+    
+@comment_ns.route('/posts/<int:post_id>/comments/<int:comment_id>')
+class CommentDetailDoc(Resource):
+    @jwt_required()
+    def delete(self, post_id, comment_id):
+        """删除评论（需登录且为评论作者）"""
+        current_email = get_jwt_identity()
+        user = UserService.get_user_by_email(current_email)
+        if not user:
+            return {'msg': '用户不存在'}, 404
+        
+        return CommentService.delete_comment(user.username, post_id, comment_id)

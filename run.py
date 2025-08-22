@@ -6,6 +6,13 @@ from app.models.comment import Comment
 
 app = create_app()
 
+@app.route('/')  
+def hello():
+    # 查询当前用户总数（示例，可根据需求扩展）
+    user_count = User.query.count()
+    post_count = Post.query.count()
+    return f"欢迎访问社区论坛 API 根路径！当前有 {user_count} 位用户，{post_count} 篇帖子～"
+
 _data_initialized = False
 
 @app.before_request

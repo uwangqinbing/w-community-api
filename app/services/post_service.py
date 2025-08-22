@@ -58,3 +58,19 @@ class PostService:
             post.likes += 1
             db.session.commit()
             return {"msg": "点赞成功", "isLiked": True, "likes": post.likes}, 200
+        
+    @staticmethod
+    def delete_post(user_id, post_id):
+        post = Post.query.get(post_id)
+        if not post:
+           return {"msg": "帖子不存在"}, 404
+    
+        if post.authorId != user_id:
+           return {"msg": "没有删除权限"}, 403
+        try:
+           db.session.delete(post)
+           db.session.commit()
+           return {"msg": "帖子删除成功"}, 200
+        except Exception as e:
+           db.session.rollback()
+           return {"msg": f"删除失败: {str(e)}"}, 500

@@ -16,7 +16,7 @@ class Post(db.Model):
     authorId = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     author = db.relationship('User', backref='posts')  # 关联用户
     date = db.Column(db.String(50), nullable=False)
-    tags = db.Column(db.Text, nullable=False)
+    tags = db.Column(db.Text, nullable=True)
     image = db.Column(db.String(100))
     likes = db.Column(db.Integer, default=0)
     type = db.Column(db.String(20), nullable=False)
