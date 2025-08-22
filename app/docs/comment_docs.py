@@ -4,6 +4,7 @@ from app.services.user_service import UserService
 from app.models.comment import Comment
 from app.extensions import db
 from datetime import datetime
+from app.models.post import Post
 
 # 定义命名空间
 comment_ns = Namespace('评论管理', description='帖子评论接口')
@@ -23,7 +24,7 @@ comment_model = comment_ns.model('评论信息', {
 })
 
 # 评论接口
-@comment_ns.route('/posts/<int:post_id>/comments')
+@comment_ns.route('/posts/<int:post_id>/comments', endpoint='create_comment')  # 显式指定端点
 class CommentDoc(Resource):
     @jwt_required()
     @comment_ns.expect(comment_create_model)
@@ -50,14 +51,36 @@ class CommentDoc(Resource):
         db.session.commit()
         return new_comment.to_dict()
     
-@comment_ns.route('/posts/<int:post_id>/comments/<int:comment_id>')
-class CommentDetailDoc(Resource):
+@comment_ns.route('/comments/<int:comment_id>', endpoint='delete_comment')  # 显式指定端点
+class CommentDeleteDoc(Resource):
     @jwt_required()
-    def delete(self, post_id, comment_id):
-        """删除评论（需登录且为评论作者）"""
+    def delete(self, comment_id):
+        """删除评论（需登录，根据权限控制）"""
+        """
+        权限说明：
+        - 超级管理员：可以删除所有评论
+        - 版主：可以删除自己板块下的评论
+        - 普通用户：只能删除自己的评论
+        """
         current_email = get_jwt_identity()
         user = UserService.get_user_by_email(current_email)
         if not user:
             return {'msg': '用户不存在'}, 404
         
-        return CommentService.delete_comment(user.username, post_id, comment_id)
+        comment = Comment.query.get(comment_id)
+        if not comment:
+            return {'msg': '评论不存在'}, 404
+            
+        post = Post.query.get(comment.post_id)
+        if not post:
+            return {'msg': '评论所属帖子不存在'}, 404
+            
+        # 权限检查逻辑（与路由中相同）
+        if not (user.is_admin() or 
+                (user.is_moderator() and post.section in (user.moderator_for.split(',') if user.moderator_for else [])) or
+                comment.author == user.username):
+            return {'msg': '没有权限删除此评论'}, 403
+            
+        db.session.delete(comment)
+        db.session.commit()
+        return {'msg': '评论已成功删除'}, 200

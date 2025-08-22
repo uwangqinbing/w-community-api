@@ -45,3 +45,14 @@ def toggle_like(post_id):
     
     except Exception as e:
         return jsonify({"msg": f"服务器错误：{str(e)}"}), 500
+    
+@post_bp.route('/posts/<int:post_id>', methods=['DELETE'])
+@jwt_required()
+def delete_post(post_id):
+    current_email = get_jwt_identity()
+    user = UserService.get_user_by_email(current_email)
+    if not user:
+        return jsonify({"msg": "用户不存在"}), 404
+    
+    result, status = PostService.delete_post(user.id, post_id)
+    return jsonify(result), status

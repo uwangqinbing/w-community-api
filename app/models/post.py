@@ -9,7 +9,6 @@ post_likes = db.Table(
 
 class Post(db.Model):
     __tablename__ = 'post'
-
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -20,6 +19,7 @@ class Post(db.Model):
     image = db.Column(db.String(100))
     likes = db.Column(db.Integer, default=0)
     type = db.Column(db.String(20), nullable=False)
+    section = db.Column(db.String(50), nullable=False, default='general')  # 板块名称
     comments = db.relationship('Comment', backref='post', lazy=True, cascade="all, delete-orphan")  # 级联删除评论
     liked_users = db.relationship('User', secondary=post_likes, backref='liked_posts')  # 点赞用户
 

@@ -3,6 +3,7 @@ from app.extensions import db
 from app.models.user import User  
 from app.models.post import Post  
 from app.models.comment import Comment
+from datetime import datetime
 
 app = create_app()
 
@@ -21,14 +22,46 @@ def init_test_data():
     if not _data_initialized:
         with app.app_context():
             if not User.query.first():
-                from datetime import datetime
                 # 创建测试用户
-                user1 = User(username="TechLover", email="tech@example.com", password="123456", avatar="/OIP-C.webp")
-                user2 = User(username="GamerPro", email="game@example.com", password="123456", avatar="/OIP-C.webp")
-                db.session.add_all([user1, user2])
-                db.session.commit()
+                user1 = User(
+                    username="TechLover", 
+                    email="tech@example.com", 
+                    password="123456", 
+                    avatar="/OIP-C.webp",
+                    role="user"  # 添加角色字段
+                )
+                user2 = User(
+                    username="GamerPro", 
+                    email="game@example.com", 
+                    password="123456", 
+                    avatar="/OIP-C.webp",
+                    role="user"  # 添加角色字段
+                )
                 
-                # 创建测试帖子
+                # 创建管理员用户
+                admin = User(
+                    username="Admin", 
+                    email="admin@example.com", 
+                    password="admin123",  # 生产环境需修改
+                    avatar="/OIP-C.webp",
+                    role="admin"
+                )
+                
+                # 创建版主用户
+                moderator = User(
+                    username="Moderator", 
+                    email="moderator@example.com", 
+                    password="mod123",  # 生产环境需修改
+                    avatar="/OIP-C.webp",
+                    role="moderator",
+                    moderator_for="tech,games"  # 管理tech和games板块
+                )
+                
+                # 批量添加用户
+                db.session.add_all([user1, user2, admin, moderator])
+                db.session.commit()  # 先提交用户，获取用户ID
+                
+                # 创建测试帖子（依赖用户ID）
                 post1 = Post(
                     title="测试帖子1",
                     content="这是第一个测试帖子",
@@ -37,7 +70,8 @@ def init_test_data():
                     tags="测试,技术",
                     type="posts",
                     image="",
-                    likes=0
+                    likes=0,
+                    section="tech"  # 添加板块字段
                 )
                 post2 = Post(
                     title="测试帖子2",
@@ -47,10 +81,12 @@ def init_test_data():
                     tags="测试,生活",
                     type="posts",
                     image="",
-                    likes=0
+                    likes=0,
+                    section="games"  # 添加板块字段
                 )
                 db.session.add_all([post1, post2])
                 db.session.commit()
+        
         _data_initialized = True
 
 if __name__ == '__main__':
