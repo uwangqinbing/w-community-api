@@ -10,30 +10,26 @@ def create_app(config_name='default'):
     app = Flask(__name__, static_folder='../public')
     app.config.from_object(config[config_name])
 
-    # 初始化扩展（顺序无关）
+    # 初始化扩展
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
     
-    # 关键：只配置一次 CORS，合并所有规则
     CORS(app, 
          resources={
-             r"/api/*": {  # 对所有 /api 前缀接口生效
-                 "origins": "http://localhost:5173",  # 允许前端地址
-                 "supports_credentials": True,  # 允许携带 Token/Cookie
-                 "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]  # 包含所有需要的方法
+             r"/api/*": {
+                 "origins": "http://localhost:5173",
+                 "supports_credentials": True,
+                 "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
              }
          },
-         # 全局默认配置（可选，这里留空避免冲突）
-         origins=app.config.get('CORS_ORIGINS', []),
-         supports_credentials=True
     )
 
-    # 注册蓝图（确保所有蓝图路径正确）
+    # 注册蓝图
     app.register_blueprint(user_bp)
-    app.register_blueprint(post_bp)  # 确保 post_bp 注册时带了 /api 前缀
+    app.register_blueprint(post_bp)
     app.register_blueprint(comment_bp)
-    app.register_blueprint(report_bp) # 举报功能的蓝图必须注册
+    app.register_blueprint(report_bp)
     app.register_blueprint(docs_bp)
 
     # 静态资源路由
